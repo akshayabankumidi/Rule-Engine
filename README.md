@@ -1,6 +1,11 @@
 # Rule Engine Project
 
 This project implements a simple 3-tier rule engine application with a frontend interface, backend API, and database integration. It allows users to create, combine, and evaluate complex logical rules.
+## Visual References
+
+## Database Schema 
+![image](https://github.com/user-attachments/assets/818c2a88-e2e0-4ebd-ad2d-3ede6b60ece4)
+
 
 ## Features
 
@@ -122,11 +127,221 @@ fetch('/api/rules/evaluate-rule', {
 
 ## Testing
 
-Run the test suite with:
+As this project does not include automated unit tests, we encourage manual testing using the following sample inputs and expected outputs. These tests cover the main functionalities and some edge cases of the Rule Engine.
 
+### How to Test
+
+1. Ensure your backend server is running (`node src/app.js`)
+2. Use a tool like Postman, curl, or the fetch API in your browser console to send requests to the appropriate endpoints
+3. Compare the responses with the expected outputs provided below
+
+### Test Cases
+
+#### 1. Create Rule
+
+**Endpoint:** POST `/api/rules/create-rule`
+
+**Input:**
+```json
+{
+  "name": "Adult in Sales",
+  "ruleString": "(age >= 18 AND department = 'Sales')"
+}
 ```
-npm test
+
+**Expected Output:**
+```json
+{
+  "success": true,
+  "ruleId": 1,
+  "ast": {
+    "type": "operator",
+    "value": "AND",
+    "left": {
+      "type": "operand",
+      "value": "age >= 18"
+    },
+    "right": {
+      "type": "operand",
+      "value": "department = 'Sales'"
+    }
+  }
+}
 ```
+
+#### 2. Combine Rules
+
+**Endpoint:** POST `/api/rules/combine-rules`
+
+**Input:**
+```json
+{
+  "rules": [
+    "(age >= 18 AND department = 'Sales')",
+    "(experience > 5 OR salary > 50000)"
+  ]
+}
+```
+
+**Expected Output:**
+```json
+{
+  "success": true,
+  "combinedAst": {
+    "type": "operator",
+    "value": "AND",
+    "left": {
+      "type": "operator",
+      "value": "AND",
+      "left": {
+        "type": "operand",
+        "value": "age >= 18"
+      },
+      "right": {
+        "type": "operand",
+        "value": "department = 'Sales'"
+      }
+    },
+    "right": {
+      "type": "operator",
+      "value": "OR",
+      "left": {
+        "type": "operand",
+        "value": "experience > 5"
+      },
+      "right": {
+        "type": "operand",
+        "value": "salary > 50000"
+      }
+    }
+  }
+}
+```
+
+#### 3. Evaluate Rule
+
+**Endpoint:** POST `/api/rules/evaluate-rule`
+
+**Input:**
+```json
+{
+  "ast": {
+    "type": "operator",
+    "value": "AND",
+    "left": {
+      "type": "operator",
+      "value": "AND",
+      "left": {
+        "type": "operand",
+        "value": "age >= 18"
+      },
+      "right": {
+        "type": "operand",
+        "value": "department = 'Sales'"
+      }
+    },
+    "right": {
+      "type": "operator",
+      "value": "OR",
+      "left": {
+        "type": "operand",
+        "value": "experience > 5"
+      },
+      "right": {
+        "type": "operand",
+        "value": "salary > 50000"
+      }
+    }
+  },
+  "data": {
+    "age": 30,
+    "department": "Sales",
+    "experience": 7,
+    "salary": 55000
+  }
+}
+```
+
+**Expected Output:**
+```json
+{
+  "success": true,
+  "isEligible": true
+}
+```
+
+### Error Handling Tests
+
+The Rule Engine also handles various error cases. Here are some examples:
+
+#### 4. Create Rule with Invalid Syntax
+
+**Input:**
+```json
+{
+  "name": "Invalid Rule",
+  "ruleString": "(age > AND department = 'Sales')"
+}
+```
+
+**Expected Output:**
+```json
+{
+  "success": false,
+  "error": "Invalid rule string: Unexpected token 'AND'"
+}
+```
+
+#### 5. Evaluate Rule with Missing Data
+
+**Input:**
+```json
+{
+  "ast": {
+    "type": "operand",
+    "value": "age >= 18"
+  },
+  "data": {
+    "department": "Sales"
+  }
+}
+```
+
+**Expected Output:**
+```json
+{
+  "success": false,
+  "error": "Data missing required attribute: age"
+}
+```
+
+#### 6. Combine Empty Rule Set
+
+**Input:**
+```json
+{
+  "rules": []
+}
+```
+
+**Expected Output:**
+```json
+{
+  "success": false,
+  "error": "Invalid input: rules must be a non-empty array of strings"
+}
+```
+
+### Additional Error Handling
+
+The Rule Engine also handles other syntax errors in rule strings, such as:
+- Missing parentheses: `age >= 18 AND department = 'Sales'`
+- Extra parentheses: `((age >= 18) AND (department = 'Sales'))`
+- Invalid operators: `age >= 18 XOR department = 'Sales'`
+
+When testing, try various malformed inputs to ensure the system responds with appropriate error messages.
+
+Note: The actual error messages may vary slightly based on the specific implementation.
 
 ## Additional Notes
 
@@ -134,17 +349,3 @@ npm test
 - CORS is enabled to allow frontend and backend to run on different ports during development.
 - Input validation is implemented to prevent invalid rule strings or data formats.
 
-## Future Improvements
-
-- Implement user authentication for secure rule management
-- Add support for more complex rule operations (e.g., NOT, XOR)
-- Improve performance with caching mechanisms for frequently evaluated rules
-- Develop a more sophisticated UI for visual rule creation and management
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License.
