@@ -1,10 +1,10 @@
 # Rule Engine Project
 
 This project implements a simple 3-tier rule engine application with a frontend interface, backend API, and database integration. It allows users to create, combine, and evaluate complex logical rules.
-## Visual References
+
 
 ## Database Schema 
-![image](https://github.com/user-attachments/assets/818c2a88-e2e0-4ebd-ad2d-3ede6b60ece4)
+![image](https://github.com/user-attachments/assets/9646c5fe-2e76-465b-afc3-08fd051b47e2)
 
 
 ## Features
