@@ -49,17 +49,17 @@ This project implements a simple 3-tier rule engine application with a frontend 
      DB_PORT=5432
      ```
 
-4. Run database migrations:
-   ```
-   npm run migrate
-   ```
-
 ## Running the Application
 
 1. Start the backend server:
-   ```
-   npm start
-   ```
+   - Navigate to the `src` directory:
+     ```
+     cd src
+     ```
+   - Start the server:
+     ```
+     node app.js
+     ```
    The server will start on `http://localhost:3000`
 
 2. Open the frontend:
